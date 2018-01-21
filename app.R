@@ -22,7 +22,7 @@ library(cowplot)
 library(ggvis)
 
 #reading in data 
-data_fifa <- read_csv("../data/fifa_clean.csv")
+data_fifa <- read_csv("data/fifa_clean.csv")
 
 #variables that can be picked for x and y axis
 axis_vars <- c(

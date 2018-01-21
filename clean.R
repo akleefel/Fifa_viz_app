@@ -12,7 +12,7 @@
 library(readr)
 library(dplyr)
 
-data_fifa <- read_csv("../data/fifa.csv")
+data_fifa <- read_csv("data/fifa.csv")
 
 #adding country columns
 data_fifa <- data_fifa %>% mutate(country = ifelse(grepl("Spanish", league),"Spain"," "))
@@ -78,7 +78,7 @@ data_fifa <- data_fifa %>% rename(Passing = pas,
 
 
 
-write_csv(data_fifa, "../data/fifa_clean.csv")
+write_csv(data_fifa, "data/fifa_clean.csv")
 
 
 
