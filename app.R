@@ -38,6 +38,7 @@ axis_vars <- c(
   "Physical" = "Physical"
 )
 
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   
@@ -59,8 +60,11 @@ ui <- fluidPage(
         br(),
         
       wellPanel(
-        selectInput("xvar", "X-axis variable", axis_vars, selected = "Height_cm"),
-        selectInput("yvar", "Y-axis variable", axis_vars, selected = "Overall_skill")
+        # selectInput("xvar", "X-axis variable", axis_vars, selected = "Height_cm"),
+        # selectInput("yvar", "Y-axis variable", axis_vars, selected = "Overall_skill")
+        
+        selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
+        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
       ),
       
       br(),
@@ -143,7 +147,12 @@ server <- function(input, output) {
 
 
     xvar <- prop("x", as.symbol(input$xvar))
-    yvar <- prop("y", as.symbol(input$yvar))
+    yvar <- if (input$xvar == input$yvar){
+      stop("bind_shiny requires a ggvis object or a reactive expression that returns a ggvis object")
+    } else{
+      prop("y", as.symbol(input$yvar))
+    }
+      
     
     
     if (input$countryInput == "All") {
@@ -156,8 +165,7 @@ server <- function(input, output) {
                      fillOpacity := .4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
         layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width = 650, height = 600) 
-
+        set_options(width = 650, height = 550) 
       
     } else {
       plot1 <- fifa_filtered %>%
@@ -168,7 +176,7 @@ server <- function(input, output) {
                      fillOpacity := 0.4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
         layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width =650, height = 600) 
+        set_options(width =650, height = 550) 
     }
 
       })
@@ -193,7 +201,7 @@ server <- function(input, output) {
       ggvis(x=xvar) %>%   
       add_axis("x", title = xvar_name) %>%
       add_axis("y", title = "Density") %>%
-      set_options(width = 700, height = 600) %>% 
+      set_options(width = 700, height = 500) %>% 
       layer_densities() 
   
     

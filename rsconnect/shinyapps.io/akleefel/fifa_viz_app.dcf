@@ -1,0 +1,12 @@
+name: fifa_viz_app
+title:
+username:
+account: akleefel
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 258880
+bundleId: 1194870
+url: https://akleefel.shinyapps.io/fifa_viz_app/
+when: 1516995852.46881
+asMultiple: FALSE
+asStatic: FALSE
