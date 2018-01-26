@@ -57,11 +57,12 @@ ui <- fluidPage(
         
         position <- selectInput("positionInput",h3("Position"),
                                 c("Defence", "Midfield", "Attack")),
-        br(),
+        br(),br(),
         
       wellPanel(
-        # selectInput("xvar", "X-axis variable", axis_vars, selected = "Height_cm"),
-        # selectInput("yvar", "Y-axis variable", axis_vars, selected = "Overall_skill")
+        paste("Note: Please, do not select the same variable for x and y axis!"),br(),
+        
+        br(),
         
         selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
         selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
@@ -147,11 +148,8 @@ server <- function(input, output) {
 
 
     xvar <- prop("x", as.symbol(input$xvar))
-    yvar <- if (input$xvar == input$yvar){
-      stop("bind_shiny requires a ggvis object or a reactive expression that returns a ggvis object")
-    } else{
-      prop("y", as.symbol(input$yvar))
-    }
+    yvar <- prop("y", as.symbol(input$yvar))
+  
       
     
     

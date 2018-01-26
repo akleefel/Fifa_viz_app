@@ -1,13 +1,13 @@
 # Fifa_viz_app
 
 
-Link to app :  [Fifa_viz_app](https://akleefel.shinyapps.io/fifa_viz_app/)
+Link to shiny app :  [Fifa_viz_app](https://akleefel.shinyapps.io/fifa_viz_app/)
 
-##### App Description
+### App Description
 
 This shiny app uses data from the `Kaggle Fifa 2018` data set and visualizes the relationships of selected football player attributes (`height`, `weight`, `passing`, `shooting`, ... ), as well as the distribution across different attributes across different countries and leagues. Considering, that the player attributes in the Fifa computer game realistically reflect the real-world properties of many players some implications can be made on the real relationships between certain attributes.
 
-##### Usage Scenario
+### Usage Scenario
 
 Let's say you would like to know whether taller football players are generally better at shooting than smaller players and how this relationship holds across different leagues. Well, you could simply follow these steps:
 
@@ -23,7 +23,7 @@ Now, let's say you would like to find out whether defenders in England are heavi
 3. Select the "Attribute Distribution" tab at the top of the page
 4. Flip through different countries, positions and leagues to compare the distributions.
 
-##### Data Sources
+### Data Sources
 
 |Dataset|Link|
 |---|---|
