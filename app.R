@@ -40,7 +40,7 @@ axis_vars <- c(
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
+  
    # Application title
    titlePanel("Fifa 2018 Attribute Explorer"),
    
@@ -76,12 +76,9 @@ ui <- fluidPage(
       #Show a plot of the generated distribution
       mainPanel(
         tabsetPanel(
-          tabPanel("Visualization",ggvisOutput("plot1")),
+          tabPanel("Attribute Relationship",ggvisOutput("plot1")),
           tabPanel("Attribute Distribution",ggvisOutput("plot2")),
           tabPanel("Data Explorer",dataTableOutput("results"))
-          
-            
-          
         
       ))))
    
@@ -100,7 +97,8 @@ server <- function(input, output) {
                                         league %in% input$Competitions,
                                         position == input$positionInput)  %>% 
                                         select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                                              Shooting, dribbling, Pace, Defending, Physical,country, ID)
+                                              Shooting, Dribbling, Pace, Defending, Physical,country, ID) 
+
       
       fifa_filt <- as.data.frame(fifa_filt)
       
@@ -110,10 +108,9 @@ server <- function(input, output) {
                                                league %in% input$Competitions,
                                                position == input$positionInput) %>% 
                                                select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                                                                                           Shooting, dribbling, Pace, Defending, Physical,country,ID)
+                                                                                           Shooting, Dribbling, Pace, Defending, Physical,country,ID)
     
       fifa_filt <- as.data.frame(fifa_filt)}
-      "You entered a number less than or equal to 10"
 
     
     fifa_filt
@@ -126,7 +123,7 @@ server <- function(input, output) {
      if (is.null(x$ID)) return(NULL)
 
     
-    #Pick out the movie with this ID
+    #Pick out the player with this ID
     all_players <- isolate(fifa_filtered())
     player <- all_players[all_players$ID == x$ID, ]
     
@@ -155,12 +152,12 @@ server <- function(input, output) {
         ggvis(x = xvar, y = yvar, fill = ~country) %>%
         add_axis("x", title = xvar_name) %>%
         add_axis("y", title = yvar_name) %>%
-        layer_points(size := 50, size.hover := 200,
-                     fillOpacity := .9, fillOpacity.hover := 1, key := ~ID) %>%
+        layer_points(size := 80, size.hover := 200,
+                     fillOpacity := .4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
         layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width = 700, height = 600) 
-      
+        set_options(width = 650, height = 600) 
+
       
     } else {
       plot1 <- fifa_filtered %>%
@@ -171,14 +168,9 @@ server <- function(input, output) {
                      fillOpacity := 0.4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
         layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width = 700, height = 600)  
-      
+        set_options(width =650, height = 600) 
     }
 
-      
-
-
-    plot1
       })
 
   vis %>% bind_shiny("plot1")
@@ -242,7 +234,7 @@ server <- function(input, output) {
                            position == input$positionInput
                            
       ) %>% select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                   Shooting, dribbling, Pace, Defending, Physical)
+                   Shooting, Dribbling, Pace, Defending, Physical)
     } else{
       iltered <-
         data_fifa %>% filter(country == input$countryInput,
@@ -250,7 +242,7 @@ server <- function(input, output) {
                              position == input$positionInput
                              
         ) %>% select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                     Shooting, dribbling, Pace, Defending, Physical) 
+                     Shooting, Dribbling, Pace, Defending, Physical) 
       
     }
     
