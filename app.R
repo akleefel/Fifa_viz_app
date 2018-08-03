@@ -65,7 +65,8 @@ ui <- fluidPage(
         br(),
         
         selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
-        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
+        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill"),
+        selectInput("yvar", "Y-axis variable",axis_vars, selected = "gude")
       ),
       
       br(),
