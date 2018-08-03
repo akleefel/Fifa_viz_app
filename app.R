@@ -87,7 +87,7 @@ ui <- fluidPage(
       mainPanel(
         tabsetPanel(
           tabPanel("Attribute Relationship",ggvisOutput("plot1")),
-          tabPanel("X-Attribute Distribution",ggvisOutput("plot2")),
+          tabPanel("X-Variable Distribution",ggvisOutput("plot2")),
           tabPanel("Data Explorer",dataTableOutput("results"))
         
       ))))
@@ -178,7 +178,19 @@ server <- function(input, output) {
     yvar <- prop("y", as.symbol(input$yvar))
   
       
-    
+    reactive({
+      
+      
+      
+      switch(input$countryInput,
+             "All" = as.list(data_fifa %>% arrange(league) %>% distinct(league))$league ,
+             "England" = as.list(data_fifa %>% filter(country == "England") %>% distinct(league))$league,
+             "France" = as.list(data_fifa %>% filter(country == "France") %>% distinct(league))$league,
+             "Germany" = as.list(data_fifa %>% filter(country == "Germany") %>% distinct(league))$league,
+             "Italy" = as.list(data_fifa %>% filter(country == "Italy") %>% distinct(league))$league,
+             "Spain" = as.list(data_fifa %>% filter(country == "Spain") %>% distinct(league))$league)
+      
+    })
     
     if (input$countryInput == "All") {
       
@@ -227,9 +239,6 @@ server <- function(input, output) {
       set_options(width = 700, height = 500) %>% 
       layer_densities() 
   
-    
-    
-    plot2
   })
   
   vis2 %>% bind_shiny("plot2")
