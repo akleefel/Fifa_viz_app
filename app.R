@@ -49,12 +49,7 @@ ui <- fluidPage(
    sidebarLayout(
       sidebarPanel(
         
-        countries <- selectInput("countryInput",h3("Country"),
-                                  c("All",
-                                      "England","France", "Germany","Italy", "Spain")),
-        
-        uiOutput("secondSelection"),
-        
+      
         position <- selectInput("positionInput",h3("Position"),
                                 c("Defence", "Midfield", "Attack")),
         br(),br(),
@@ -65,9 +60,18 @@ ui <- fluidPage(
         br(),
         
         selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
-        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill"),
-        selectInput("yvar", "Y-axis variable",axis_vars, selected = "gude")
+        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
+
+        # htmlOutput("xvar_selector"),
+        # htmlOutput("yvar_selector")
       ),
+      
+      countries <- selectInput("countryInput",h3("Country"),
+                               c("All",
+                                 "England","France", "Germany","Italy", "Spain")),
+      
+      
+      uiOutput("secondSelection"),
       
       br(),
       
@@ -83,7 +87,7 @@ ui <- fluidPage(
       mainPanel(
         tabsetPanel(
           tabPanel("Attribute Relationship",ggvisOutput("plot1")),
-          tabPanel("Attribute Distribution",ggvisOutput("plot2")),
+          tabPanel("X-Attribute Distribution",ggvisOutput("plot2")),
           tabPanel("Data Explorer",dataTableOutput("results"))
         
       ))))
@@ -94,6 +98,28 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+  
+  
+  
+  output$xvar_selector <- renderUI({
+
+    selectInput(inputId = "xvar", "X-axis variable", axis_vars, selected = "Height_cm")
+
+  })
+
+
+
+  output$yvar_selector <- renderUI({
+
+    available <- axis_vars[axis_vars != input$xvar]
+
+    selectInput(
+      inputId = "yvar",
+      label = "Y-axis variable:",
+      choices = unique(available),
+      selected = unique(available)[1])
+
+  })
   
   
   fifa_filtered <- reactive({
@@ -194,8 +220,6 @@ server <- function(input, output) {
     yvar <- prop("y", as.symbol(input$yvar))
     
     
-
-      
     plot2 <- fifa_filtered %>% 
       ggvis(x=xvar) %>%   
       add_axis("x", title = xvar_name) %>%
@@ -226,7 +250,7 @@ server <- function(input, output) {
   })
   
   output$secondSelection <- renderUI({
-    checkboxGroupInput("Competitions", h3("Select Competitions"), choices = var(), selected = head(var(),13))
+    checkboxGroupInput("Competitions", h3("Competitions"), choices = var(), selected = head(var(),13))
     
   })
   
