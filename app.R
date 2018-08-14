@@ -21,6 +21,7 @@ library(readr)
 library(cowplot)
 library(ggvis)
 
+
 #reading in data 
 data_fifa <- read_csv("data/fifa_clean.csv")
 
@@ -59,11 +60,12 @@ ui <- fluidPage(
         
         br(),
         
-        selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
-        selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
+        #selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
+        # selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
 
-        # htmlOutput("xvar_selector"),
-        # htmlOutput("yvar_selector")
+        uiOutput("xvar_selector"),
+        uiOutput("yvar_selector")
+        
       ),
       
       countries <- selectInput("countryInput",h3("Country"),
@@ -100,26 +102,47 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   
+  available_y <- reactive({
+    
+    
+    if(!is.null(input$xvar)){available_vars <- axis_vars[axis_vars != input$xvar]} else {
+      available_vars <- axis_vars[axis_vars != "Height_cm"]}
+    
+   
+    
+    return(available_vars)    
+    
+  })
+  
+  available_x <- reactive({
+    
+    if(!is.null(input$yvar)){available_vars <- axis_vars[axis_vars != input$yvar]} else {
+      available_vars <- axis_vars[axis_vars != "Overall_skill"]}
+    
+    
+    return(available_vars)    
+    
+  })
   
   output$xvar_selector <- renderUI({
 
-    selectInput(inputId = "xvar", "X-axis variable", axis_vars, selected = "Height_cm")
-
+    selectInput(inputId = "xvar", "X-axis variable", available_x(), selected= input$xvar)
   })
-
-
+  
 
   output$yvar_selector <- renderUI({
-
-    available <- axis_vars[axis_vars != input$xvar]
 
     selectInput(
       inputId = "yvar",
       label = "Y-axis variable:",
-      choices = unique(available),
-      selected = unique(available)[1])
+      choices = available_y(),
+    selected = input$yvar)
 
   })
+  
+
+  #,
+  #selected = "Overall_skill"
   
   
   fifa_filtered <- reactive({
@@ -140,7 +163,7 @@ server <- function(input, output) {
                                                league %in% input$Competitions,
                                                position == input$positionInput) %>% 
                                                select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                                                                                           Shooting, Dribbling, Pace, Defending, Physical,country,ID)
+                                                      Shooting, Dribbling, Pace, Defending, Physical,country,ID)
     
       fifa_filt <- as.data.frame(fifa_filt)}
 
@@ -163,25 +186,26 @@ server <- function(input, output) {
            player$club,"</b><br>", "Overall Skill: ", player$Overall_skill)
     
   }
-  
-  
-  
+
+
   vis <- reactive({
 
 
     # Lables for axes
-    xvar_name <- names(axis_vars)[axis_vars == input$xvar]
-    yvar_name <- names(axis_vars)[axis_vars == input$yvar]
+    if(!is.null(input$xvar)){xvar_name <- names(axis_vars)[axis_vars == input$xvar]} else {
+      xvar_name <- "Height (cm)"}
+    if(!is.null(input$yvar)){yvar_name <- names(axis_vars)[axis_vars == input$yvar]} else {
+      yvar_name <- "Overall Skill"}
 
 
-    xvar <- prop("x", as.symbol(input$xvar))
-    yvar <- prop("y", as.symbol(input$yvar))
-  
-      
+    #xvar <- prop("x", as.symbol(input$xvar))
+    if(!is.null(input$xvar)){xvar <- prop("x", as.symbol(input$xvar))} else {
+      xvar <- prop("x", as.symbol("Height_cm"))}
+    if(!is.null(input$yvar)){yvar <- prop("y", as.symbol(input$yvar))} else {
+      yvar <- prop("y", as.symbol("Overall_skill"))}
     reactive({
-      
-      
-      
+
+
       switch(input$countryInput,
              "All" = as.list(data_fifa %>% arrange(league) %>% distinct(league))$league ,
              "England" = as.list(data_fifa %>% filter(country == "England") %>% distinct(league))$league,
@@ -189,11 +213,11 @@ server <- function(input, output) {
              "Germany" = as.list(data_fifa %>% filter(country == "Germany") %>% distinct(league))$league,
              "Italy" = as.list(data_fifa %>% filter(country == "Italy") %>% distinct(league))$league,
              "Spain" = as.list(data_fifa %>% filter(country == "Spain") %>% distinct(league))$league)
-      
+
     })
-    
+
     if (input$countryInput == "All") {
-      
+
       plot1 <- fifa_filtered %>%
         ggvis(x = xvar, y = yvar, fill = ~country) %>%
         add_axis("x", title = xvar_name) %>%
@@ -201,9 +225,9 @@ server <- function(input, output) {
         layer_points(size := 80, size.hover := 200,
                      fillOpacity := .4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
-        layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width = 650, height = 550) 
-      
+        layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>%
+        set_options(width = 650, height = 550)
+
     } else {
       plot1 <- fifa_filtered %>%
         ggvis(x = xvar, y = yvar, fill = ~league) %>%
@@ -212,41 +236,48 @@ server <- function(input, output) {
         layer_points(size := 50, size.hover := 200,
                      fillOpacity := 0.4, fillOpacity.hover := .8, key := ~ID) %>%
         add_tooltip(fifa_tooltip, "hover") %>%
-        layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>% 
-        set_options(width =650, height = 550) 
+        layer_smooths(opacity:= 0.4, fill:= "Blue", span = .8) %>%
+        set_options(width =650, height = 550)
     }
 
       })
 
   vis %>% bind_shiny("plot1")
-  
+
   vis2 <- reactive({
-    
+
 
     # Lables for axes
-    xvar_name <- names(axis_vars)[axis_vars == input$xvar]
-    yvar_name <- names(axis_vars)[axis_vars == input$yvar]
-    
-    
-    xvar <- prop("x", as.symbol(input$xvar))
-    yvar <- prop("y", as.symbol(input$yvar))
-    
-    
-    plot2 <- fifa_filtered %>% 
-      ggvis(x=xvar) %>%   
+    #xvar_name <- names(axis_vars)[axis_vars == input$xvar]
+    if(!is.null(input$xvar)){xvar_name <- names(axis_vars)[axis_vars == input$xvar]} else {
+      xvar_name <- "Height (cm)"}
+    if(!is.null(input$yvar)){yvar_name <- names(axis_vars)[axis_vars == input$yvar]} else {
+      yvar_name <- "Overall Skill"}
+
+
+    #xvar <- prop("x", as.symbol(input$xvar))
+    if(!is.null(input$xvar)){xvar <- prop("x", as.symbol(input$xvar))} else {
+      xvar <- prop("x", as.symbol("Height_cm"))}
+    if(!is.null(input$yvar)){yvar <- prop("y", as.symbol(input$yvar))} else {
+      yvar <- prop("y", as.symbol("Overall_skill"))}
+
+
+
+    plot2 <- fifa_filtered %>%
+      ggvis(x=xvar) %>%
       add_axis("x", title = xvar_name) %>%
       add_axis("y", title = "Density") %>%
-      set_options(width = 700, height = 500) %>% 
-      layer_densities() 
-  
+      set_options(width = 700, height = 500) %>%
+      layer_densities()
+
   })
-  
+  pdf(NULL)
   vis2 %>% bind_shiny("plot2")
-  
-  
+
+
   var <- reactive({
-    
-    
+
+
 
     switch(input$countryInput,
            "All" = as.list(data_fifa %>% arrange(league) %>% distinct(league))$league ,
@@ -255,24 +286,24 @@ server <- function(input, output) {
            "Germany" = as.list(data_fifa %>% filter(country == "Germany") %>% distinct(league))$league,
            "Italy" = as.list(data_fifa %>% filter(country == "Italy") %>% distinct(league))$league,
            "Spain" = as.list(data_fifa %>% filter(country == "Spain") %>% distinct(league))$league)
-    
+
   })
-  
+
   output$secondSelection <- renderUI({
     checkboxGroupInput("Competitions", h3("Competitions"), choices = var(), selected = head(var(),13))
-    
+
   })
-  
+
   output$results <- renderDataTable({
-    
+
     if (input$countryInput == "All") {
-    
-    
+
+
     filtered <-
       data_fifa %>% filter(country %in% c("England","France", "Germany","Italy", "Spain"),
                            league %in% input$Competitions,
                            position == input$positionInput
-                           
+
       ) %>% select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
                    Shooting, Dribbling, Pace, Defending, Physical)
     } else{
@@ -280,14 +311,14 @@ server <- function(input, output) {
         data_fifa %>% filter(country == input$countryInput,
                              league %in% input$Competitions,
                              position == input$positionInput
-                             
+
         ) %>% select(name, club, league, Overall_skill, age, Height_cm, Weight_kg,  Passing,
-                     Shooting, Dribbling, Pace, Defending, Physical) 
-      
+                     Shooting, Dribbling, Pace, Defending, Physical)
+
     }
-    
+
   })
-  
+
   output$n_players <- renderText({ nrow(fifa_filtered()) })
 }
 
