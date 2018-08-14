@@ -60,8 +60,6 @@ ui <- fluidPage(
         
         br(),
         
-        #selectInput("xvar", "X-axis variable",axis_vars, selected = "Height_cm"),
-        # selectInput("yvar", "Y-axis variable",axis_vars, selected = "Overall_skill")
 
         uiOutput("xvar_selector"),
         uiOutput("yvar_selector")
@@ -141,9 +139,6 @@ server <- function(input, output) {
   })
   
 
-  #,
-  #selected = "Overall_skill"
-  
   
   fifa_filtered <- reactive({
     

@@ -6,9 +6,6 @@
 #Alexander Kleefeldt - Jan 2018
 
 
-
-
-
 library(readr)
 library(dplyr)
 
@@ -24,6 +21,13 @@ data_fifa <- data_fifa %>% mutate(country = ifelse(grepl("French", league),"Fran
 
 #remove countries that are not mentioned above 
 data_fifa <- data_fifa %>% filter(country %in% c("England", "France", "Germany","Italy", "Spain"))
+
+#removev lower divisions 
+data_fifa <- data_fifa %>% filter(league %in% c("Spanish Primera División", "French Ligue 1", "German Bundesliga"       
+                                                ,"English Premier League",  "Italian Serie A", "English Championship"    
+                                                ,"Spanish Segunda División", "French Ligue 2", "German 2. Bundesliga"    
+                                                ,"Italian Serie B"))
+
 
 
 #create "position" column 
